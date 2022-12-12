@@ -1,22 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Type Ahead 👀</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <form class="search-form">
+      <input type="text" class="search" placeholder="City or State" />
+      <ul class="suggestions">
+        <li>Filter for a city</li>
+        <li>or a state</li>
+      </ul>
+    </form>
+    <script>
+      const endpoint =
+        "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
 
-  <form class="search-form">
-    <input type="text" class="search" placeholder="City or State">
-    <ul class="suggestions">
-      <li>Filter for a city</li>
-      <li>or a state</li>
-    </ul>
-  </form>
-<script>
-const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+      async function getData(url) {
+        let response = await fetch(url);
+        let data = await response.json();
+        return data;
+      }
 
-</script>
-</body>
+      let cities = [];
+      getData(endpoint)
+        .then((result) => cities.push(...result))
+        .catch(() => console.log("fail"));
+
+      const input = document.querySelector(".search"),
+        ul = document.querySelector(".suggestions");
+
+        function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+      function findMatches(wordToMatch, cities) {
+        return cities.filter((place) => {
+          const regex = new RegExp(wordToMatch, "gi");
+          return place.city.match(regex) || place.state.match(regex);
+        });
+      }
+
+      function displaySuggestions() {
+        let result = findMatches(input.value, cities);
+        result.forEach((place) => {
+          let li = document.createElement("li");
+          const regex = new RegExp(input.value, "gi"),
+            cityName = place.city.replace(
+              regex,
+              `<span class="hl">${input.value}</span>`
+            ),
+            stateName = place.state.replace(
+              regex,
+              `<span class="hl">${input.value}</span>`
+            );
+          li.innerHTML = `
+          <span class="name">${cityName}, ${stateName}</span>
+          <span class="population">${numberWithCommas(place.population)}</span>
+          `;
+          ul.append(li);
+        });
+      }
+
+      function clearData() {
+        ul.innerHTML = "";
+      }
+
+      input.addEventListener("input", () => {
+        clearData();
+        displaySuggestions();
+        if (input.value == "") {
+          ul.innerHTML = `<li>Type a city or a state</li>`;
+        }
+      });
+    </script>
+  </body>
 </html>

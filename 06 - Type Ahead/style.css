@@ -1,7 +1,7 @@
 html {
   box-sizing: border-box;
   background: #ffc600;
-  font-family: 'helvetica neue';
+  font-family: 'Unbounded', cursive;
   font-size: 20px;
   font-weight: 200;
 }
@@ -39,7 +39,7 @@ input.search {
   margin: 0;
   padding: 0;
   position: relative;
-  /*perspective: 20px;*/
+  /* perspective: 20px; */
 }
 
 .suggestions li {
